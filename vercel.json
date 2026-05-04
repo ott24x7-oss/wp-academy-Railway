@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/ai/daily/run?cron=1",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 9 * * *"
     },
     {
       "path": "/api/cron/healthcheck-courses",
