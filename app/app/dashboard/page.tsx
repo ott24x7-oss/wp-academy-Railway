@@ -1,10 +1,27 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { BarChart3, BookOpen, Share2, TrendingUp, Users, Zap } from 'lucide-react'
+import { createSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/auth-client'
 
 export default function DashboardPage() {
+  const [userName, setUserName] = useState('User')
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return
+    const supabase = createSupabaseBrowserClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        const name = user.user_metadata?.name || user.email?.split('@')[0] || 'User'
+        setUserName(name)
+      }
+    })
+  }, [])
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="font-serif text-3xl font-bold mb-2">Welcome back, User</h1>
+        <h1 className="font-serif text-3xl font-bold mb-2">Welcome back, {userName}</h1>
         <p className="text-text-dim">Here's what's happening with your learning and campaigns</p>
       </div>
 

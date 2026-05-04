@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   BookOpen,
   Share2,
@@ -12,8 +12,10 @@ import {
   X,
   Settings,
   LogOut,
+  User,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/auth-client'
 
 const navItems = [
   { href: '/app/dashboard', label: 'Dashboard', icon: BarChart3 },
@@ -24,26 +26,87 @@ const navItems = [
   { href: '/app/ai', label: 'AI', icon: Sparkles },
 ]
 
-export default function AppLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+interface UserInfo {
+  email: string
+  name?: string
+  plan?: string
+}
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [user, setUser] = useState<UserInfo | null>(null)
+  const [loggingOut, setLoggingOut] = useState(false)
+
+  useEffect(() => {
+    loadUser()
+  }, [])
+
+  async function loadUser() {
+    if (!isSupabaseConfigured()) {
+      setUser({ email: 'demo@watshop.in', name: 'Demo User', plan: 'free' })
+      return
+    }
+    try {
+      const supabase = createSupabaseBrowserClient()
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser()
+      if (authUser) {
+        // Try to load profile from users table
+        const { data: profile } = await supabase
+          .from('users')
+          .select('name, plan')
+          .eq('id', authUser.id)
+          .maybeSingle()
+        setUser({
+          email: authUser.email || '',
+          name: profile?.name || authUser.user_metadata?.name,
+          plan: profile?.plan || 'free',
+        })
+      }
+    } catch (e) {
+      console.warn('Auth check failed:', e)
+    }
+  }
+
+  async function handleLogout() {
+    setLoggingOut(true)
+    try {
+      if (isSupabaseConfigured()) {
+        const supabase = createSupabaseBrowserClient()
+        await supabase.auth.signOut()
+      }
+      router.push('/')
+      router.refresh()
+    } catch (e) {
+      console.error('Logout failed:', e)
+    } finally {
+      setLoggingOut(false)
+    }
+  }
+
+  const userInitials = user?.name
+    ? user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : user?.email?.[0]?.toUpperCase() || 'U'
 
   return (
     <div className="min-h-screen bg-bg">
       {/* Desktop Sidebar */}
       <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:w-64 md:border-r md:border-line md:bg-bg-2 md:overflow-y-auto md:flex md:flex-col">
         <div className="p-6 border-b border-line">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber to-amber/50 flex items-center justify-center">
               <span className="text-bg font-bold text-sm">W</span>
             </div>
             <span className="font-serif text-lg font-bold">WatShop</span>
-          </div>
+          </Link>
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
@@ -64,16 +127,31 @@ export default function AppLayout({
         </nav>
 
         <div className="border-t border-line p-4 space-y-2">
+          {user && (
+            <div className="flex items-center gap-3 px-4 py-3 mb-2 bg-bg rounded-lg">
+              <div className="w-8 h-8 rounded-full bg-amber flex items-center justify-center text-bg font-bold text-sm flex-shrink-0">
+                {userInitials}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{user.name || user.email}</p>
+                <p className="text-xs text-text-dim capitalize">{user.plan} plan</p>
+              </div>
+            </div>
+          )}
           <Link
             href="/app/settings/billing"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-text-dim hover:text-text hover:bg-bg-3`}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-text-dim hover:text-text hover:bg-bg-3"
           >
             <Settings className="w-5 h-5" />
             <span className="text-sm font-medium">Settings</span>
           </Link>
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-text-dim hover:text-text hover:bg-bg-3">
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-text-dim hover:text-text hover:bg-bg-3 disabled:opacity-50"
+          >
             <LogOut className="w-5 h-5" />
-            <span className="text-sm font-medium">Logout</span>
+            <span className="text-sm font-medium">{loggingOut ? 'Signing out...' : 'Logout'}</span>
           </button>
         </div>
       </aside>
@@ -97,9 +175,19 @@ export default function AppLayout({
             </button>
           </div>
 
-          {/* Mobile Menu */}
           {mobileMenuOpen && (
             <nav className="border-t border-line p-4 space-y-2">
+              {user && (
+                <div className="flex items-center gap-3 px-3 py-2 mb-3 bg-bg rounded-lg">
+                  <div className="w-8 h-8 rounded-full bg-amber flex items-center justify-center text-bg font-bold text-sm">
+                    {userInitials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{user.name || user.email}</p>
+                    <p className="text-xs text-text-dim capitalize">{user.plan} plan</p>
+                  </div>
+                </div>
+              )}
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -121,6 +209,13 @@ export default function AppLayout({
               >
                 Settings
               </Link>
+              <button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="w-full text-left px-4 py-2 rounded-lg transition-colors text-sm text-rose hover:bg-bg-3"
+              >
+                {loggingOut ? 'Signing out...' : 'Logout'}
+              </button>
             </nav>
           )}
         </div>

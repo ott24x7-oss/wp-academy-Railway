@@ -35,6 +35,9 @@ dependencies:
   '@radix-ui/react-toast':
     specifier: ^1.2.0
     version: 1.2.15(@types/react-dom@19.2.3)(@types/react@19.2.14)(react-dom@19.2.5)(react@19.2.5)
+  '@supabase/ssr':
+    specifier: ^0.10.2
+    version: 0.10.2(@supabase/supabase-js@2.105.1)
   '@supabase/supabase-js':
     specifier: ^2.45.0
     version: 2.105.1
@@ -2205,6 +2208,15 @@ packages:
       - utf-8-validate
     dev: false
 
+  /@supabase/ssr@0.10.2(@supabase/supabase-js@2.105.1):
+    resolution: {integrity: sha512-JFbchN63CXLFHJRNT7udec4/RoD9PmXkSGko3QSO6vUuqGBtSzdmxR7FPfQNr7SuFd65I7Xv46q66ALjEN1cgQ==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.102.1
+    dependencies:
+      '@supabase/supabase-js': 2.105.1
+      cookie: 1.1.1
+    dev: false
+
   /@supabase/storage-js@2.105.1:
     resolution: {integrity: sha512-owfdCNH5ikXXDusjzsgU6LavEBqGUoueOnL/9XIucld70/WJ/rbqp89K//c9QPICDNuegsmpoeasydDAiucLKQ==}
     engines: {node: '>=20.0.0'}
@@ -3179,6 +3191,11 @@ packages:
     dependencies:
       ini: 1.3.8
       proto-list: 1.2.4
+    dev: false
+
+  /cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
+    engines: {node: '>=18'}
     dev: false
 
   /core-util-is@1.0.3:
