@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, Sparkles, Loader2 } from 'lucide-react'
+import { Send, Sparkles, Loader2, Wand2, Bot } from 'lucide-react'
+import Link from 'next/link'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -89,6 +90,20 @@ export default function AIPage() {
           AI Assistant
         </h1>
         <p className="text-text-dim">Powered by Claude — get instant help with marketing</p>
+        <div className="flex gap-2 mt-3">
+          <Link
+            href="/app/ai/generator"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-2 border border-line rounded-lg text-sm hover:border-amber transition-colors"
+          >
+            <Wand2 className="w-4 h-4 text-amber" /> Content Generator
+          </Link>
+          <Link
+            href="/app/ai/daily-bot"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-bg-2 border border-line rounded-lg text-sm hover:border-amber transition-colors"
+          >
+            <Bot className="w-4 h-4 text-amber" /> Daily Bot
+          </Link>
+        </div>
       </div>
 
       {/* Chat area */}
