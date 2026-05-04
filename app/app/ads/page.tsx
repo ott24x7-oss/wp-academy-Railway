@@ -1,61 +1,70 @@
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, Link2, TrendingUp, IndianRupee, Target, Eye } from 'lucide-react'
 
 export default function AdsPage() {
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 className="font-serif text-3xl font-bold mb-2">Ads Manager</h1>
-          <p className="text-text-dim">Create and manage campaigns across all platforms</p>
+          <h1 className="font-serif text-2xl md:text-3xl font-bold mb-1">Ads Manager</h1>
+          <p className="text-text-dim text-sm">
+            Manage campaigns across Meta, Google, LinkedIn & TikTok
+          </p>
         </div>
-        <Link
-          href="/app/ads/campaigns/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-amber text-bg rounded-lg font-semibold hover:bg-amber/90 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          New Campaign
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/app/ads/accounts"
+            className="inline-flex items-center gap-2 px-4 py-2.5 border border-line rounded-xl font-medium text-sm hover:bg-bg-3"
+          >
+            <Link2 className="w-4 h-4" />
+            <span className="hidden md:inline">Connect</span> Accounts
+          </Link>
+          <Link
+            href="/app/ads/campaigns/new"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber text-bg rounded-xl font-semibold text-sm hover:bg-amber/90"
+          >
+            <Plus className="w-4 h-4" />
+            New Campaign
+          </Link>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      {/* KPIs */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Total Spent', value: '$2,450', change: '+12%' },
-          { label: 'Conversions', value: '324', change: '+18%' },
-          { label: 'ROAS', value: '3.2x', change: '+5%' },
-          { label: 'Impressions', value: '156K', change: '-2%' },
-        ].map((stat, i) => (
-          <div key={i} className="bg-bg-2 border border-line rounded-lg p-6">
-            <p className="text-text-dim text-sm mb-2">{stat.label}</p>
-            <div className="flex items-end justify-between">
-              <p className="text-3xl font-bold">{stat.value}</p>
-              <span className="text-sm text-emerald">{stat.change}</span>
-            </div>
+          { label: 'Total Spend', value: '$0', icon: IndianRupee, color: 'text-amber' },
+          { label: 'Conversions', value: '0', icon: Target, color: 'text-emerald' },
+          { label: 'ROAS', value: '0.0x', icon: TrendingUp, color: 'text-violet' },
+          { label: 'Impressions', value: '0', icon: Eye, color: 'text-sky' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-bg-2 border border-line rounded-2xl p-4">
+            <kpi.icon className={`w-5 h-5 mb-2 ${kpi.color}`} />
+            <p className="text-xs text-text-dim mb-1">{kpi.label}</p>
+            <p className="text-2xl font-bold">{kpi.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-bg-2 border border-line rounded-lg p-6">
-        <h2 className="font-serif text-xl font-bold mb-4">Active Campaigns</h2>
-        <div className="space-y-4">
-          {[
-            { name: 'Summer Sale Campaign', platform: 'Meta', status: 'Active', spent: '$1,200' },
-            { name: 'Lead Generation', platform: 'Google', status: 'Active', spent: '$800' },
-            { name: 'Awareness Campaign', platform: 'LinkedIn', status: 'Paused', spent: '$450' },
-          ].map((campaign, i) => (
-            <div key={i} className="flex items-center justify-between p-4 border border-line rounded-lg">
-              <div>
-                <p className="font-semibold text-sm">{campaign.name}</p>
-                <p className="text-xs text-text-dim">{campaign.platform}</p>
-              </div>
-              <div className="text-right">
-                <span className="inline-block px-2 py-1 text-xs rounded-full mr-4 bg-emerald/20 text-emerald">
-                  {campaign.status}
-                </span>
-                <p className="text-sm font-semibold">{campaign.spent}</p>
-              </div>
-            </div>
-          ))}
+      {/* Empty state */}
+      <div className="bg-bg-2 border border-line rounded-2xl p-8 text-center">
+        <Target className="w-12 h-12 text-text-dim mx-auto mb-3" />
+        <h3 className="font-serif text-lg font-bold mb-1">No campaigns yet</h3>
+        <p className="text-text-dim text-sm mb-4">
+          Connect a platform first, then create your first campaign
+        </p>
+        <div className="flex flex-col md:flex-row gap-2 justify-center">
+          <Link
+            href="/app/ads/accounts"
+            className="px-5 py-2.5 border border-line text-text rounded-xl font-medium text-sm hover:bg-bg-3"
+          >
+            Connect Account
+          </Link>
+          <Link
+            href="/app/ads/campaigns/new"
+            className="px-5 py-2.5 bg-amber text-bg rounded-xl font-semibold text-sm hover:bg-amber/90"
+          >
+            Create Campaign
+          </Link>
         </div>
       </div>
     </div>

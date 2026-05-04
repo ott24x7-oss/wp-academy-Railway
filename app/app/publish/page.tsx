@@ -1,35 +1,82 @@
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, Link2, Share2, Calendar, FileText, Sparkles } from 'lucide-react'
 
 export default function PublishPage() {
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <h1 className="font-serif text-3xl font-bold mb-2">Publish</h1>
-          <p className="text-text-dim">Create and schedule posts across social media</p>
+          <h1 className="font-serif text-2xl md:text-3xl font-bold mb-1">Publish</h1>
+          <p className="text-text-dim text-sm">
+            Schedule posts across all your social platforms
+          </p>
         </div>
+        <div className="flex gap-2">
+          <Link
+            href="/app/publish/accounts"
+            className="inline-flex items-center gap-2 px-4 py-2.5 border border-line rounded-xl font-medium text-sm hover:bg-bg-3"
+          >
+            <Link2 className="w-4 h-4" />
+            <span className="hidden md:inline">Connect</span> Accounts
+          </Link>
+          <Link
+            href="/app/publish/compose"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber text-bg rounded-xl font-semibold text-sm hover:bg-amber/90"
+          >
+            <Plus className="w-4 h-4" />
+            New Post
+          </Link>
+        </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <Link
           href="/app/publish/compose"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-amber text-bg rounded-lg font-semibold hover:bg-amber/90 transition-colors"
+          className="bg-bg-2 border border-line rounded-2xl p-4 hover:border-amber/50 transition-colors group"
         >
-          <Plus className="w-5 h-5" />
-          New Post
+          <div className="w-11 h-11 rounded-xl bg-amber/15 flex items-center justify-center mb-3">
+            <Sparkles className="w-5 h-5 text-amber" />
+          </div>
+          <p className="font-semibold text-sm">AI Compose</p>
+          <p className="text-xs text-text-dim mt-0.5">Generate with Claude</p>
+        </Link>
+        <Link
+          href="/app/publish"
+          className="bg-bg-2 border border-line rounded-2xl p-4 hover:border-amber/50 transition-colors group"
+        >
+          <div className="w-11 h-11 rounded-xl bg-sky/15 flex items-center justify-center mb-3">
+            <Calendar className="w-5 h-5 text-sky" />
+          </div>
+          <p className="font-semibold text-sm">Calendar</p>
+          <p className="text-xs text-text-dim mt-0.5">Scheduled posts</p>
+        </Link>
+        <Link
+          href="/app/publish/accounts"
+          className="bg-bg-2 border border-line rounded-2xl p-4 hover:border-amber/50 transition-colors group"
+        >
+          <div className="w-11 h-11 rounded-xl bg-emerald/15 flex items-center justify-center mb-3">
+            <Share2 className="w-5 h-5 text-emerald" />
+          </div>
+          <p className="font-semibold text-sm">Accounts</p>
+          <p className="text-xs text-text-dim mt-0.5">Connect platforms</p>
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="bg-bg-2 border border-line rounded-lg p-4">
-            <div className="aspect-square bg-gradient-to-br from-sky/20 to-violet/20 rounded-lg mb-4"></div>
-            <h3 className="font-semibold mb-2">Post Title {i + 1}</h3>
-            <p className="text-sm text-text-dim mb-4 line-clamp-2">This is a sample post content that would appear on your social media...</p>
-            <div className="flex items-center justify-between text-xs text-text-dim">
-              <span>Scheduled for today</span>
-              <span>2 platforms</span>
-            </div>
-          </div>
-        ))}
+      {/* Empty state */}
+      <div className="bg-bg-2 border border-line rounded-2xl p-8 text-center">
+        <FileText className="w-12 h-12 text-text-dim mx-auto mb-3" />
+        <h3 className="font-serif text-lg font-bold mb-1">No posts yet</h3>
+        <p className="text-text-dim text-sm mb-4">
+          Compose your first post or connect an account
+        </p>
+        <Link
+          href="/app/publish/compose"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber text-bg rounded-xl font-semibold text-sm hover:bg-amber/90"
+        >
+          <Plus className="w-4 h-4" />
+          Compose New Post
+        </Link>
       </div>
     </div>
   )
