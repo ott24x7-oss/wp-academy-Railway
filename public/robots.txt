@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /pricing
+Allow: /api/health
+
+Disallow: /app/
+Disallow: /api/
+Disallow: .env
+
+Sitemap: /sitemap.xml

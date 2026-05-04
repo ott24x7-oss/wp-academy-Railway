@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-bg text-text;
+  font-feature-settings: 'rlig' 1, 'calt' 1;
+}
+
+* {
+  @apply border-line;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-bg-2;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-line-2 rounded hover:bg-line;
+}
+
+/* Focus styles */
+:focus-visible {
+  @apply outline-2 outline-sky outline-offset-2;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  @apply outline-2 outline-sky outline-offset-2;
+}

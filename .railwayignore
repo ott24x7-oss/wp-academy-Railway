@@ -1,0 +1,9 @@
+node_modules
+.next/cache
+.env
+.env.local
+coverage
+*.log
+.DS_Store
+scripts/local-only
+docs/local-only

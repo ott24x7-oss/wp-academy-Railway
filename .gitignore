@@ -1,0 +1,68 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Production
+build
+dist
+.next
+*.tsbuildinfo
+
+# Misc
+.DS_Store
+.env
+.env.local
+.env.*.local
+.cache
+.turbo
+.idea
+.vscode
+*.log
+*.swp
+*.swo
+*~
+
+# IDE
+.vs
+.vscode
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# dotenv environment variables file
+.env
+
+# Mac files
+.DS_Store
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+
+# Local development
+.local
+.env.test
+.env.test.local
+scripts/local-only
+docs/local-only
