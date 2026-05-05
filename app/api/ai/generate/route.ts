@@ -1,5 +1,46 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { generateAI, listAvailableProviders, SYSTEM_PROMPTS, type AIProvider } from '@/lib/ai-providers'
+import { getCurrentUser } from '@/lib/auth-server'
+import { getSupabaseServerClient } from '@/lib/supabase'
+
+// Rough cost in cents per 1M tokens (input + output averaged)
+const COST_PER_M_TOKENS_CENTS: Record<string, number> = {
+  'claude-haiku-4-5-20251001': 100, // $1
+  'gemini-2.0-flash': 10, // $0.10
+  'meta-llama/llama-3.3-70b-instruct:free': 0, // free
+}
+
+function estimateCostCents(model: string, totalTokens: number): number {
+  const rate = COST_PER_M_TOKENS_CENTS[model] ?? 50
+  return Math.round((totalTokens * rate) / 1_000_000)
+}
+
+async function logUsage(
+  userId: string | null,
+  endpoint: string,
+  provider: string,
+  model: string,
+  tokens: number,
+  success: boolean,
+  errorMessage?: string
+) {
+  try {
+    const supabase = getSupabaseServerClient()
+    await supabase.from('ai_usage_log').insert({
+      user_id: userId,
+      endpoint,
+      provider,
+      model,
+      input_tokens: Math.round(tokens * 0.4),
+      output_tokens: Math.round(tokens * 0.6),
+      estimated_cost_cents: estimateCostCents(model, tokens),
+      success,
+      error_message: errorMessage,
+    })
+  } catch {
+    // non-fatal
+  }
+}
 
 interface GenerateRequest {
   type: 'social-post' | 'daily-quote' | 'daily-question' | 'blog-intro' | 'custom'
@@ -53,7 +94,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'topic required' }, { status: 400 })
     }
 
-    const available = listAvailableProviders()
+    const available = await listAvailableProviders()
     if (available.length === 0) {
       return NextResponse.json(
         {
@@ -82,6 +123,15 @@ export async function POST(request: NextRequest) {
     const results = settled.filter((r): r is { text: string; provider: AIProvider; model: string; tokensUsed?: number } => 'text' in r)
     const errors = settled.filter((r): r is { error: string } => 'error' in r)
 
+    // Log usage for analytics
+    const user = await getCurrentUser().catch(() => null)
+    for (const r of results) {
+      logUsage(user?.id || null, 'generate', r.provider, r.model, r.tokensUsed || 0, true)
+    }
+    for (const e of errors) {
+      logUsage(user?.id || null, 'generate', body.provider || 'unknown', body.model || 'unknown', 0, false, e.error)
+    }
+
     if (results.length === 0) {
       return NextResponse.json(
         { error: errors[0]?.error || 'All generation attempts failed' },
@@ -108,7 +158,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   return NextResponse.json({
-    providers: listAvailableProviders(),
+    providers: await listAvailableProviders(),
     types: ['social-post', 'daily-quote', 'daily-question', 'blog-intro', 'custom'],
   })
 }

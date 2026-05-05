@@ -19,20 +19,50 @@ import {
   Shield,
   ArrowRight,
   ListOrdered,
+  Plug,
+  Sparkles,
+  Bot,
+  BarChart3,
+  History,
+  ToggleRight,
+  Activity,
+  Download,
+  FileText,
 } from 'lucide-react'
 import { createSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/auth-client'
 
 const SUPER_ADMIN_EMAILS = ['ensofter@gmail.com']
 
-const navItems = [
-  { href: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true },
-  { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/plans', label: 'Plans', icon: CreditCard },
-  { href: '/admin/payments', label: 'Payments', icon: IndianRupee },
-  { href: '/admin/courses', label: 'Courses', icon: BookOpen },
-  { href: '/admin/email', label: 'Email / SMTP', icon: Mail },
-  { href: '/admin/site', label: 'Site & Branding', icon: Globe },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
+interface NavItem {
+  href: string
+  label: string
+  icon: any
+  exact?: boolean
+  group?: string
+}
+
+const navItems: NavItem[] = [
+  { href: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true, group: 'Dashboard' },
+
+  { href: '/admin/users', label: 'Users', icon: Users, group: 'Operations' },
+  { href: '/admin/plans', label: 'Plans', icon: CreditCard, group: 'Operations' },
+  { href: '/admin/payments', label: 'Payments', icon: IndianRupee, group: 'Operations' },
+  { href: '/admin/courses', label: 'Courses', icon: BookOpen, group: 'Operations' },
+
+  { href: '/admin/integrations', label: 'API Keys', icon: Plug, group: 'AI & Integrations' },
+  { href: '/admin/ai-usage', label: 'AI Usage', icon: Sparkles, group: 'AI & Integrations' },
+  { href: '/admin/daily-bots', label: 'Daily Bots', icon: Bot, group: 'AI & Integrations' },
+
+  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3, group: 'Insights' },
+  { href: '/admin/activity', label: 'Activity Log', icon: History, group: 'Insights' },
+  { href: '/admin/health', label: 'System Health', icon: Activity, group: 'Insights' },
+
+  { href: '/admin/email', label: 'SMTP', icon: Mail, group: 'Configuration' },
+  { href: '/admin/email-templates', label: 'Email Templates', icon: FileText, group: 'Configuration' },
+  { href: '/admin/site', label: 'Site & Branding', icon: Globe, group: 'Configuration' },
+  { href: '/admin/feature-flags', label: 'Feature Flags', icon: ToggleRight, group: 'Configuration' },
+  { href: '/admin/backup', label: 'Backup / Export', icon: Download, group: 'Configuration' },
+  { href: '/admin/settings', label: 'Settings', icon: Settings, group: 'Configuration' },
 ]
 
 const bottomTabs = [
@@ -155,20 +185,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                isActive(item)
-                  ? 'bg-amber text-bg font-semibold'
-                  : 'text-text-dim hover:text-text hover:bg-bg-3'
-              }`}
-            >
-              <item.icon className="w-5 h-5" />
-              <span className="text-sm">{item.label}</span>
-            </Link>
+        <nav className="flex-1 p-3 space-y-3 overflow-y-auto">
+          {Array.from(new Set(navItems.map((i) => i.group))).map((group) => (
+            <div key={group}>
+              {group && (
+                <p className="px-4 py-1.5 text-[10px] uppercase tracking-wider font-semibold text-text-dim/70">
+                  {group}
+                </p>
+              )}
+              <div className="space-y-0.5">
+                {navItems
+                  .filter((i) => i.group === group)
+                  .map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-3 px-4 py-2 rounded-xl transition-colors ${
+                        isActive(item)
+                          ? 'bg-amber text-bg font-semibold'
+                          : 'text-text-dim hover:text-text hover:bg-bg-3'
+                      }`}
+                    >
+                      <item.icon className="w-4 h-4" />
+                      <span className="text-sm">{item.label}</span>
+                    </Link>
+                  ))}
+              </div>
+            </div>
           ))}
         </nav>
 

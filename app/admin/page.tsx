@@ -13,6 +13,14 @@ import {
   ListOrdered,
   TrendingUp,
   Shield,
+  Plug,
+  Sparkles,
+  Bot,
+  BarChart3,
+  ToggleRight,
+  Activity,
+  Download,
+  History,
 } from 'lucide-react'
 import { createSupabaseBrowserClient, isSupabaseConfigured } from '@/lib/auth-client'
 
@@ -27,55 +35,27 @@ interface ActionCard {
 }
 
 const actionCards: ActionCard[] = [
-  {
-    href: '/admin/payments',
-    title: 'Platform Payment',
-    subtitle: 'UPI + IMAP for subscriptions',
-    icon: IndianRupee,
-    iconBg: 'bg-amber/15',
-    iconColor: 'text-amber',
-  },
-  {
-    href: '/admin/payments?tab=verify',
-    title: 'Subscriptions',
-    subtitle: 'Verify, cancel, scan now',
-    icon: Bell,
-    iconBg: 'bg-amber/15',
-    iconColor: 'text-amber',
-  },
-  {
-    href: '/admin/email',
-    title: 'Email / SMTP',
-    subtitle: 'Outbound mail config',
-    icon: Mail,
-    iconBg: 'bg-amber/20',
-    iconColor: 'text-amber',
-    hasAlert: true,
-  },
-  {
-    href: '/admin/plans',
-    title: 'Plans',
-    subtitle: 'Pricing & feature limits',
-    icon: CreditCard,
-    iconBg: 'bg-amber/15',
-    iconColor: 'text-amber',
-  },
-  {
-    href: '/admin/users',
-    title: 'Users',
-    subtitle: 'Suspend, edit plan, assign',
-    icon: Users,
-    iconBg: 'bg-amber/15',
-    iconColor: 'text-amber',
-  },
-  {
-    href: '/admin/site',
-    title: 'Site content',
-    subtitle: 'Marketing copy, branding',
-    icon: FileText,
-    iconBg: 'bg-amber/15',
-    iconColor: 'text-amber',
-  },
+  // Operations
+  { href: '/admin/users', title: 'Users', subtitle: 'Suspend, edit plan, assign', icon: Users, iconBg: 'bg-amber/15', iconColor: 'text-amber' },
+  { href: '/admin/payments', title: 'Payments', subtitle: 'UPI + IMAP verification', icon: IndianRupee, iconBg: 'bg-amber/15', iconColor: 'text-amber' },
+  { href: '/admin/courses', title: 'Courses', subtitle: 'Add, edit, bulk import', icon: BookOpen, iconBg: 'bg-amber/15', iconColor: 'text-amber' },
+  { href: '/admin/plans', title: 'Plans', subtitle: 'Pricing & feature limits', icon: CreditCard, iconBg: 'bg-amber/15', iconColor: 'text-amber' },
+
+  // AI & Integrations
+  { href: '/admin/integrations', title: 'API Keys', subtitle: 'Gemini, OpenRouter, SMTP, etc.', icon: Plug, iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400', hasAlert: true },
+  { href: '/admin/ai-usage', title: 'AI Usage', subtitle: 'Tokens, calls, cost', icon: Sparkles, iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400' },
+  { href: '/admin/daily-bots', title: 'Daily Bots', subtitle: 'All scheduled AI bots', icon: Bot, iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400' },
+
+  // Insights
+  { href: '/admin/analytics', title: 'Analytics', subtitle: 'Charts: signups, revenue, posts', icon: BarChart3, iconBg: 'bg-sky/15', iconColor: 'text-sky' },
+  { href: '/admin/health', title: 'System Health', subtitle: 'DB, cron, errors, env status', icon: Activity, iconBg: 'bg-sky/15', iconColor: 'text-sky' },
+  { href: '/admin/activity', title: 'Activity Log', subtitle: 'Admin actions audit trail', icon: History, iconBg: 'bg-sky/15', iconColor: 'text-sky' },
+
+  // Configuration
+  { href: '/admin/email', title: 'SMTP Config', subtitle: 'Outbound mail setup', icon: Mail, iconBg: 'bg-amber/15', iconColor: 'text-amber' },
+  { href: '/admin/email-templates', title: 'Email Templates', subtitle: 'Welcome, payment, reset emails', icon: FileText, iconBg: 'bg-amber/15', iconColor: 'text-amber' },
+  { href: '/admin/feature-flags', title: 'Feature Flags', subtitle: 'Toggle features on/off', icon: ToggleRight, iconBg: 'bg-amber/15', iconColor: 'text-amber' },
+  { href: '/admin/backup', title: 'Backup / Export', subtitle: 'JSON dump of all data', icon: Download, iconBg: 'bg-amber/15', iconColor: 'text-amber' },
 ]
 
 interface Stat {
@@ -207,6 +187,9 @@ export default function AdminOverviewPage() {
               Configure these to enable all platform features:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <Link href="/admin/integrations" className="text-amber hover:underline">
+                🔌 API keys (AI, SMTP, social) →
+              </Link>
               <Link href="/admin/email" className="text-amber hover:underline">
                 ✉️ SMTP / Email setup →
               </Link>
@@ -215,6 +198,15 @@ export default function AdminOverviewPage() {
               </Link>
               <Link href="/admin/plans" className="text-amber hover:underline">
                 💰 Pricing plans →
+              </Link>
+              <Link href="/admin/email-templates" className="text-amber hover:underline">
+                📧 Email templates →
+              </Link>
+              <Link href="/admin/feature-flags" className="text-amber hover:underline">
+                🚦 Feature flags →
+              </Link>
+              <Link href="/admin/health" className="text-amber hover:underline">
+                ❤️ System health check →
               </Link>
               <Link href="/admin/site" className="text-amber hover:underline">
                 🎨 Site branding →

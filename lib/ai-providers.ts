@@ -9,6 +9,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk'
+import { getConfig } from './admin-config'
 
 export type AIProvider = 'anthropic' | 'gemini' | 'openrouter'
 
@@ -35,18 +36,19 @@ const DEFAULT_MODELS: Record<AIProvider, string> = {
   openrouter: 'meta-llama/llama-3.3-70b-instruct:free',
 }
 
-function pickProvider(requested?: AIProvider): AIProvider {
+async function pickProvider(requested?: AIProvider): Promise<AIProvider> {
   if (requested) return requested
-  if (process.env.GEMINI_API_KEY) return 'gemini'
-  if (process.env.OPENROUTER_API_KEY) return 'openrouter'
-  if (process.env.ANTHROPIC_API_KEY) return 'anthropic'
-  throw new Error('No AI provider configured. Set GEMINI_API_KEY, OPENROUTER_API_KEY, or ANTHROPIC_API_KEY.')
+  if (await getConfig('GEMINI_API_KEY')) return 'gemini'
+  if (await getConfig('OPENROUTER_API_KEY')) return 'openrouter'
+  if (await getConfig('ANTHROPIC_API_KEY')) return 'anthropic'
+  throw new Error('No AI provider configured. Set GEMINI_API_KEY, OPENROUTER_API_KEY, or ANTHROPIC_API_KEY in admin → Integrations.')
 }
 
 // ─── Anthropic ───────────────────────────────────────
 async function generateAnthropic(opts: AIGenerateOptions): Promise<AIGenerateResult> {
-  if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not set')
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  const apiKey = await getConfig('ANTHROPIC_API_KEY')
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set')
+  const client = new Anthropic({ apiKey })
   const model = opts.model || DEFAULT_MODELS.anthropic
   const messages = [
     ...(opts.history || []).slice(-10).map((m) => ({ role: m.role, content: m.content })),
@@ -70,7 +72,8 @@ async function generateAnthropic(opts: AIGenerateOptions): Promise<AIGenerateRes
 
 // ─── Gemini ──────────────────────────────────────────
 async function generateGemini(opts: AIGenerateOptions): Promise<AIGenerateResult> {
-  if (!process.env.GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not set')
+  const apiKey = await getConfig('GEMINI_API_KEY')
+  if (!apiKey) throw new Error('GEMINI_API_KEY not set')
   const model = opts.model || DEFAULT_MODELS.gemini
 
   const contents = [
@@ -92,7 +95,7 @@ async function generateGemini(opts: AIGenerateOptions): Promise<AIGenerateResult
     body.systemInstruction = { parts: [{ text: opts.system }] }
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -111,7 +114,8 @@ async function generateGemini(opts: AIGenerateOptions): Promise<AIGenerateResult
 
 // ─── OpenRouter ──────────────────────────────────────
 async function generateOpenRouter(opts: AIGenerateOptions): Promise<AIGenerateResult> {
-  if (!process.env.OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY not set')
+  const apiKey = await getConfig('OPENROUTER_API_KEY')
+  if (!apiKey) throw new Error('OPENROUTER_API_KEY not set')
   const model = opts.model || DEFAULT_MODELS.openrouter
 
   const messages: any[] = []
@@ -125,7 +129,7 @@ async function generateOpenRouter(opts: AIGenerateOptions): Promise<AIGenerateRe
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
       'HTTP-Referer': process.env.SITE_URL || 'https://academy.watshop.in',
       'X-Title': 'WatShop Academy',
     },
@@ -147,7 +151,7 @@ async function generateOpenRouter(opts: AIGenerateOptions): Promise<AIGenerateRe
 
 // ─── Master dispatcher ───────────────────────────────
 export async function generateAI(opts: AIGenerateOptions): Promise<AIGenerateResult> {
-  const provider = pickProvider(opts.provider)
+  const provider = await pickProvider(opts.provider)
   switch (provider) {
     case 'anthropic':
       return generateAnthropic(opts)
@@ -160,11 +164,11 @@ export async function generateAI(opts: AIGenerateOptions): Promise<AIGenerateRes
   }
 }
 
-export function listAvailableProviders(): AIProvider[] {
+export async function listAvailableProviders(): Promise<AIProvider[]> {
   const out: AIProvider[] = []
-  if (process.env.GEMINI_API_KEY) out.push('gemini')
-  if (process.env.OPENROUTER_API_KEY) out.push('openrouter')
-  if (process.env.ANTHROPIC_API_KEY) out.push('anthropic')
+  if (await getConfig('GEMINI_API_KEY')) out.push('gemini')
+  if (await getConfig('OPENROUTER_API_KEY')) out.push('openrouter')
+  if (await getConfig('ANTHROPIC_API_KEY')) out.push('anthropic')
   return out
 }
 
